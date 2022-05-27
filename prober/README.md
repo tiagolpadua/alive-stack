@@ -90,3 +90,7 @@ Easily start your Reactive RESTful Web Services
 
 <https://quarkus.io/guides/openapi-swaggerui>
 <http://localhost:8080/q/swagger-ui>
+
+## USING THE MONGODB CLIENT
+
+<https://quarkus.io/guides/mongodb>
