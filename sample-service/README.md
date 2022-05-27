@@ -1,4 +1,4 @@
-# prober Project
+# sample-service Project
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
@@ -12,12 +12,6 @@ You can run your application in dev mode that enables live coding using:
 ./mvnw compile quarkus:dev
 ```
 
-Or:
-
-```shell script
-quarkus dev
-```
-
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
 
 ## Packaging and running the application
@@ -26,12 +20,6 @@ The application can be packaged using:
 
 ```shell script
 ./mvnw package
-```
-
-Or:
-
-```shell script
-quarkus build
 ```
 
 It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
@@ -61,7 +49,7 @@ Or, if you don't have GraalVM installed, you can run the native executable build
 ./mvnw package -Pnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/prober-1.0.0-SNAPSHOT-runner`
+You can then execute your native executable with: `./target/sample-service-1.0.0-SNAPSHOT-runner`
 
 If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
 
