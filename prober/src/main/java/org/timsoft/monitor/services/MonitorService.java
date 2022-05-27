@@ -1,39 +1,39 @@
 package org.timsoft.monitor.services;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 
 import org.bson.Document;
 import org.timsoft.monitor.models.Monitor;
+import org.timsoft.utils.ProberException;
 
 @ApplicationScoped
 public class MonitorService {
+    private static final String MONITORS_COLLECTION = "monitors";
+    private static final String PROBER_DB = "prober";
 
     @Inject
     MongoClient mongoClient;
 
     public List<Monitor> list() {
-        List<Monitor> list = new ArrayList<>();
-        MongoCursor<Document> cursor = getCollection().find().iterator();
+        var list = new ArrayList<Monitor>();
+        var cursor = getCollection().find().iterator();
 
         try {
             while (cursor.hasNext()) {
-                Document document = cursor.next();
-                Monitor monitor = new Monitor();
-                monitor.setName(document.getString("name"));
-                monitor.setIntervalSeconds(document.getLong("intervalSeconds"));
-                monitor.setTimeoutSeconds(document.getLong("timeoutSeconds"));
-
-                // private List<String> urls;
-                // private HttpMethod httpMethod;
-
+                var document = cursor.next();
+                var monitor = new Monitor(document);
                 list.add(monitor);
             }
         } finally {
@@ -42,17 +42,54 @@ public class MonitorService {
         return list;
     }
 
-    public void add(Monitor monitor) {
-        Document document = new Document()
-                .append("name", monitor.getName())
-                .append("intervalSeconds", monitor.getIntervalSeconds())
-                .append("timeoutSeconds", monitor.getTimeoutSeconds());
+    // https://mongodb.github.io/mongo-java-driver/3.4/driver/getting-started/quick-start/
+    public Optional<Monitor> findByName(String name) {
+        var whereQuery = new BasicDBObject();
+        whereQuery.put(Monitor.FIELD_NAME, name);
 
-        getCollection().insertOne(document);
+        var document = getCollection().find(whereQuery).first();
+
+        Monitor monitor = null;
+
+        if (document != null) {
+            monitor = new Monitor(document);
+        }
+
+        return Optional.ofNullable(monitor);
+
     }
 
-    private MongoCollection getCollection() {
-        return mongoClient.getDatabase("monitor").getCollection("monitor");
+    public String add(Monitor monitor) {
+        // Check all URLs
+        monitor.getUrls().stream().filter(url -> !isValidURL(url)).findAny().ifPresent(url -> {
+            throw new ProberException("URL is invalid: " + url);
+        });
+
+        // Check if name is already in use
+        findByName(monitor.getName()).ifPresent(foundMonitor -> {
+            throw new ProberException("Monitor name already in use: " + foundMonitor.getName());
+        });
+
+        var document = monitor.toDocument();
+        getCollection().insertOne(document);
+        var id = document.getObjectId(Monitor.FIELD_ID);
+
+        return id.toString();
+    }
+
+    private MongoCollection<Document> getCollection() {
+        return mongoClient.getDatabase(PROBER_DB).getCollection(MONITORS_COLLECTION);
+    }
+
+    private boolean isValidURL(String url) {
+        try {
+            new URL(url).toURI();
+            return true;
+        } catch (URISyntaxException exception) {
+            return false;
+        } catch (MalformedURLException exception) {
+            return false;
+        }
     }
 
 }

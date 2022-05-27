@@ -94,3 +94,4 @@ Easily start your Reactive RESTful Web Services
 ## USING THE MONGODB CLIENT
 
 <https://quarkus.io/guides/mongodb>
+mongo-express: <http://localhost:8081/>

@@ -2,14 +2,61 @@ package org.timsoft.monitor.models;
 
 import java.util.List;
 
-import io.vertx.core.http.HttpMethod;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
+import org.bson.Document;
 
 public class Monitor {
+    public static final String FIELD_ID = "_id";
+    public static final String FIELD_NAME = "name";
+    public static final String FIELD_URLS = "urls";
+    public static final String FIELD_HTTP_METHOD = "httpMethod";
+    public static final String FIELD_INTERVAL_SECONDS = "intervalSeconds";
+    public static final String FIELD_TIMEOUT_SECONDS = "timeoutSeconds";
+
+    private String id;
+
+    @NotBlank(message = "Name may not be blank")
     private String name;
+
+    @NotEmpty(message = "URL list cannot be empty.")
     private List<String> urls;
-    private Long intervalSeconds;
-    private Long timeoutSeconds;
-    private HttpMethod httpMethod;
+
+    @Min(1)
+    @Max(9999)
+    private Integer intervalSeconds;
+
+    @Min(1)
+    @Max(9999)
+    private Integer timeoutSeconds;
+
+    @NotBlank(message = "Http method may not be blank")
+    @Pattern(regexp = "HEAD|GET")
+    private String httpMethod;
+
+    public Monitor() {
+    }
+
+    public Monitor(Document document) {
+        this.setId(document.getObjectId(FIELD_ID).toString());
+        this.setName(document.getString(FIELD_NAME));
+        this.setUrls(document.getList(FIELD_URLS, String.class));
+        this.setHttpMethod(document.getString(FIELD_HTTP_METHOD));
+        this.setIntervalSeconds(document.getInteger(FIELD_INTERVAL_SECONDS));
+        this.setTimeoutSeconds(document.getInteger(FIELD_TIMEOUT_SECONDS));
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -27,27 +74,56 @@ public class Monitor {
         this.urls = urls;
     }
 
-    public Long getIntervalSeconds() {
+    public Integer getIntervalSeconds() {
         return intervalSeconds;
     }
 
-    public void setIntervalSeconds(Long intervalSeconds) {
+    public void setIntervalSeconds(Integer intervalSeconds) {
         this.intervalSeconds = intervalSeconds;
     }
 
-    public Long getTimeoutSeconds() {
+    public Integer getTimeoutSeconds() {
         return timeoutSeconds;
     }
 
-    public void setTimeoutSeconds(Long timeoutSeconds) {
+    public void setTimeoutSeconds(Integer timeoutSeconds) {
         this.timeoutSeconds = timeoutSeconds;
     }
 
-    public HttpMethod getHttpMethod() {
+    public String getHttpMethod() {
         return httpMethod;
     }
 
-    public void setHttpMethod(HttpMethod httpMethod) {
+    public void setHttpMethod(String httpMethod) {
         this.httpMethod = httpMethod;
+    }
+
+    public Document toDocument() {
+        var document = new Document();
+        if (this.getId() != null) {
+            document.append(FIELD_ID, this.getId());
+        }
+
+        if (this.getName() != null) {
+            document.append(FIELD_NAME, this.getName());
+        }
+
+        if (this.getUrls() != null) {
+            document.append(FIELD_URLS, this.getUrls());
+        }
+
+        if (this.getHttpMethod() != null) {
+            document.append(FIELD_HTTP_METHOD, this.getHttpMethod());
+        }
+
+        if (this.getIntervalSeconds() != null) {
+            document.append(FIELD_INTERVAL_SECONDS, this.getIntervalSeconds());
+        }
+
+        if (this.getTimeoutSeconds() != null) {
+            document.append(FIELD_TIMEOUT_SECONDS, this.getTimeoutSeconds());
+        }
+
+        return document;
     }
 }
