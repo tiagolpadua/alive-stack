@@ -18,6 +18,8 @@ import org.bson.Document;
 import org.timsoft.monitor.models.Monitor;
 import org.timsoft.utils.ProberException;
 
+import static com.mongodb.client.model.Filters.*;
+
 @ApplicationScoped
 public class MonitorService {
     private static final String MONITORS_COLLECTION = "monitors";
@@ -56,7 +58,13 @@ public class MonitorService {
         }
 
         return Optional.ofNullable(monitor);
+    }
 
+    public void deleteByName(String name) {
+        var res = getCollection().deleteOne(eq(Monitor.FIELD_NAME, name));
+        if (res.getDeletedCount() == 0) {
+            throw new ProberException("Monitor not found: " + name);
+        }
     }
 
     public String add(Monitor monitor) {
@@ -67,8 +75,10 @@ public class MonitorService {
 
         // Check if name is already in use
         findByName(monitor.getName()).ifPresent(foundMonitor -> {
-            throw new ProberException("Monitor name already in use: " + foundMonitor.getName());
+            throw new ProberException("Monitor already in use: " + foundMonitor.getName());
         });
+
+        monitor.setId(null);
 
         var document = monitor.toDocument();
         getCollection().insertOne(document);

@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -32,6 +33,15 @@ public class MonitorResource {
     public Monitor getByName(@PathParam("name") String name) {
         return monitorService.findByName(name)
                 .orElseThrow(() -> new EntityNotFoundException("Monitor not found: " + name));
+    }
+
+    @DELETE
+    @Path("/{name}")
+    public RestResponse<Object> deleteByName(@PathParam("name") String name) {
+        monitorService.deleteByName(name);
+        return ResponseBuilder.ok()
+                .status(StatusCode.NO_CONTENT)
+                .build();
     }
 
     @POST
