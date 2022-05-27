@@ -12,6 +12,12 @@ You can run your application in dev mode that enables live coding using:
 ./mvnw compile quarkus:dev
 ```
 
+You can change de default port using:
+
+```shell script
+./mvnw compile quarkus:dev -Dquarkus.http.port=9000
+```
+
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
 
 ## Packaging and running the application
@@ -64,3 +70,12 @@ If you want to learn more about building native executables, please consult <htt
 Easily start your Reactive RESTful Web Services
 
 [Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+
+## SMALLRYE HEALTH
+
+<https://quarkus.io/guides/smallrye-health>
+
+- /q/health/live - The application is up and running.
+- /q/health/ready - The application is ready to serve requests.
+- /q/health/started - The application is started.
+- /q/health - Accumulating all health check procedures in the application.

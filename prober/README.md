@@ -76,3 +76,17 @@ If you want to learn more about building native executables, please consult <htt
 Easily start your Reactive RESTful Web Services
 
 [Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+
+## SMALLRYE HEALTH
+
+<https://quarkus.io/guides/smallrye-health>
+
+- <http://localhost:8080/q/health/live> - The application is up and running.
+- <http://localhost:8080/q/health/ready> - The application is ready to serve requests.
+- <http://localhost:8080/q/health/started> - The application is started.
+- <http://localhost:8080/q/health> - Accumulating all health check procedures in the application.
+
+## USING OPENAPI AND SWAGGER UI
+
+<https://quarkus.io/guides/openapi-swaggerui>
+<http://localhost:8080/q/swagger-ui>
