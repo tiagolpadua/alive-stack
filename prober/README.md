@@ -102,9 +102,12 @@ Sample:
 
 ```json
 {
-    "name": "foo",
+    "name": "my-localhost",
     "urls": [
-        "https://google.com", "https://facebook.com"
+        "http://localhost:9000/q/health/live",
+        "http://localhost:9001/q/health/live",
+        "http://localhost:9002/q/health/live",
+        "http://localhost:9003/q/health/live"
     ],
     "intervalSeconds": 10,
     "timeoutSeconds": 10,

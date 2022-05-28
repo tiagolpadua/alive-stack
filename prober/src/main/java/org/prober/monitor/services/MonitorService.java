@@ -1,5 +1,7 @@
 package org.prober.monitor.services;
 
+import static com.mongodb.client.model.Filters.eq;
+
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -15,10 +17,11 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 
 import org.bson.Document;
+import org.prober.job.services.JobService;
 import org.prober.monitor.models.Monitor;
 import org.prober.utils.ProberException;
 
-import static com.mongodb.client.model.Filters.*;
+import io.quarkus.logging.Log;
 
 @ApplicationScoped
 public class MonitorService {
@@ -27,6 +30,9 @@ public class MonitorService {
 
     @Inject
     MongoClient mongoClient;
+
+    @Inject
+    JobService jobService;
 
     public List<Monitor> list() {
         var list = new ArrayList<Monitor>();
@@ -65,6 +71,10 @@ public class MonitorService {
         if (res.getDeletedCount() == 0) {
             throw new ProberException("Monitor not found: " + name);
         }
+
+        if (jobService.isJobForMonitorRunning(name)) {
+            jobService.unscheduleJob(name);
+        }
     }
 
     public String add(Monitor monitor) {
@@ -84,6 +94,10 @@ public class MonitorService {
         getCollection().insertOne(document);
         var id = document.getObjectId(Monitor.FIELD_ID);
 
+        if (monitor.getActive() != null && monitor.getActive() == true) {
+            jobService.scheduleJob(monitor.getName());
+        }
+
         return id.toString();
     }
 
@@ -98,11 +112,30 @@ public class MonitorService {
         document.remove(Monitor.FIELD_ID);
         document.remove(Monitor.FIELD_NAME);
 
+        find(monitor.getName())
+                .orElseThrow(() -> new ProberException("Monitor not found: " + monitor.getName()));
+
         var res = getCollection().updateOne(eq(Monitor.FIELD_NAME, monitor.getName()),
                 new Document("$set", document));
 
+        if (monitor.getActive() != null && monitor.getActive() == true) {
+            if (!jobService.isJobForMonitorRunning(monitor.getName())) {
+                Log.info("No job running for: " + monitor.getName());
+                jobService.scheduleJob(monitor.getName());
+            } else {
+                Log.info("Job already running for: " + monitor.getName());
+            }
+        } else {
+            if (jobService.isJobForMonitorRunning(monitor.getName())) {
+                Log.info("Job running for: " + monitor.getName());
+                jobService.unscheduleJob(monitor.getName());
+            } else {
+                Log.info("No job running for: " + monitor.getName());
+            }
+        }
+
         if (res.getModifiedCount() == 0) {
-            throw new ProberException("Monitor not found: " + monitor.getName());
+            throw new ProberException("Monitor not changed: " + monitor.getName());
         }
     }
 
