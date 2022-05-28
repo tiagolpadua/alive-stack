@@ -111,3 +111,9 @@ Sample:
     "httpMethod": "GET"
 }
 ```
+
+## MICROMETER METRICS
+
+<https://quarkus.io/guides/micrometer>
+
+<http://localhost:8080/q/metrics>

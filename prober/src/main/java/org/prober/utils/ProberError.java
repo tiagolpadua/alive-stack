@@ -1,4 +1,4 @@
-package org.timsoft.utils;
+package org.prober.utils;
 
 public class ProberError {
     String message;

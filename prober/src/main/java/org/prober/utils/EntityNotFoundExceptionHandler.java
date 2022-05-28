@@ -1,4 +1,4 @@
-package org.timsoft.utils;
+package org.prober.utils;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;

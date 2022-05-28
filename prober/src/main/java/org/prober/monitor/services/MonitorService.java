@@ -1,4 +1,4 @@
-package org.timsoft.monitor.services;
+package org.prober.monitor.services;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -15,8 +15,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 
 import org.bson.Document;
-import org.timsoft.monitor.models.Monitor;
-import org.timsoft.utils.ProberException;
+import org.prober.monitor.models.Monitor;
+import org.prober.utils.ProberException;
 
 import static com.mongodb.client.model.Filters.*;
 

@@ -1,4 +1,4 @@
-package org.timsoft.monitor.resources;
+package org.prober.monitor.resources;
 
 import java.util.List;
 
@@ -14,9 +14,9 @@ import javax.ws.rs.PathParam;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder;
 import org.jboss.resteasy.reactive.RestResponse.StatusCode;
-import org.timsoft.monitor.models.Monitor;
-import org.timsoft.monitor.services.MonitorService;
-import org.timsoft.utils.EntityNotFoundException;
+import org.prober.monitor.models.Monitor;
+import org.prober.monitor.services.MonitorService;
+import org.prober.utils.EntityNotFoundException;
 
 @Path("/monitors")
 public class MonitorResource {

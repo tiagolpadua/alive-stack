@@ -1,4 +1,4 @@
-package org.timsoft.monitor.models;
+package org.prober.monitor.models;
 
 import java.util.List;
 
@@ -7,6 +7,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import javax.ws.rs.HttpMethod;
 
 import org.bson.Document;
 
@@ -17,6 +18,7 @@ public class Monitor {
     public static final String FIELD_HTTP_METHOD = "httpMethod";
     public static final String FIELD_INTERVAL_SECONDS = "intervalSeconds";
     public static final String FIELD_TIMEOUT_SECONDS = "timeoutSeconds";
+    public static final String FIELD_ACTIVE = "active";
 
     private String id;
 
@@ -35,8 +37,10 @@ public class Monitor {
     private Integer timeoutSeconds;
 
     @NotBlank(message = "Http method may not be blank")
-    @Pattern(regexp = "HEAD|GET")
+    @Pattern(regexp = HttpMethod.HEAD + "|" + HttpMethod.GET)
     private String httpMethod;
+
+    private Boolean active;
 
     public Monitor() {
     }
@@ -48,6 +52,12 @@ public class Monitor {
         this.setHttpMethod(document.getString(FIELD_HTTP_METHOD));
         this.setIntervalSeconds(document.getInteger(FIELD_INTERVAL_SECONDS));
         this.setTimeoutSeconds(document.getInteger(FIELD_TIMEOUT_SECONDS));
+
+        if (document.getBoolean(FIELD_ACTIVE) != null && document.getBoolean(FIELD_ACTIVE) == true) {
+            this.setActive(true);
+        } else {
+            this.setActive(false);
+        }
     }
 
     public String getId() {
@@ -98,6 +108,14 @@ public class Monitor {
         this.httpMethod = httpMethod;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
     public Document toDocument() {
         var document = new Document();
         if (this.getId() != null) {
@@ -122,6 +140,12 @@ public class Monitor {
 
         if (this.getTimeoutSeconds() != null) {
             document.append(FIELD_TIMEOUT_SECONDS, this.getTimeoutSeconds());
+        }
+
+        if (this.getActive() != null && this.getActive() == true) {
+            document.append(FIELD_ACTIVE, true);
+        } else {
+            document.append(FIELD_ACTIVE, false);
         }
 
         return document;
