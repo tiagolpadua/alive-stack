@@ -95,3 +95,19 @@ Easily start your Reactive RESTful Web Services
 
 <https://quarkus.io/guides/mongodb>
 mongo-express: <http://localhost:8081/>
+
+## REST API
+
+Sample:
+
+```json
+{
+    "name": "foo",
+    "urls": [
+        "https://google.com", "https://facebook.com"
+    ],
+    "intervalSeconds": 10,
+    "timeoutSeconds": 10,
+    "httpMethod": "GET"
+}
+```

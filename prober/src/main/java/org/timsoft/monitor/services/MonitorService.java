@@ -45,7 +45,7 @@ public class MonitorService {
     }
 
     // https://mongodb.github.io/mongo-java-driver/3.4/driver/getting-started/quick-start/
-    public Optional<Monitor> findByName(String name) {
+    public Optional<Monitor> find(String name) {
         var whereQuery = new BasicDBObject();
         whereQuery.put(Monitor.FIELD_NAME, name);
 
@@ -60,7 +60,7 @@ public class MonitorService {
         return Optional.ofNullable(monitor);
     }
 
-    public void deleteByName(String name) {
+    public void delete(String name) {
         var res = getCollection().deleteOne(eq(Monitor.FIELD_NAME, name));
         if (res.getDeletedCount() == 0) {
             throw new ProberException("Monitor not found: " + name);
@@ -73,9 +73,9 @@ public class MonitorService {
             throw new ProberException("URL is invalid: " + url);
         });
 
-        // Check if name is already in use
-        findByName(monitor.getName()).ifPresent(foundMonitor -> {
-            throw new ProberException("Monitor already in use: " + foundMonitor.getName());
+        // Check if name is already exists
+        find(monitor.getName()).ifPresent(foundMonitor -> {
+            throw new ProberException("Monitor already exists: " + foundMonitor.getName());
         });
 
         monitor.setId(null);
@@ -85,6 +85,25 @@ public class MonitorService {
         var id = document.getObjectId(Monitor.FIELD_ID);
 
         return id.toString();
+    }
+
+    public void update(Monitor monitor) {
+        // Check all URLs
+        monitor.getUrls().stream().filter(url -> !isValidURL(url)).findAny().ifPresent(url -> {
+            throw new ProberException("URL is invalid: " + url);
+        });
+
+        var document = monitor.toDocument();
+
+        document.remove(Monitor.FIELD_ID);
+        document.remove(Monitor.FIELD_NAME);
+
+        var res = getCollection().updateOne(eq(Monitor.FIELD_NAME, monitor.getName()),
+                new Document("$set", document));
+
+        if (res.getModifiedCount() == 0) {
+            throw new ProberException("Monitor not found: " + monitor.getName());
+        }
     }
 
     private MongoCollection<Document> getCollection() {
